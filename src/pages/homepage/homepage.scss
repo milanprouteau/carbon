@@ -1,0 +1,144 @@
+.homepage {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  position: relative;
+
+  &__left {
+    width: 35%;
+    height: 100%;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  &__right {
+    width: 65%;
+    height: 100%;
+  }
+}
+
+.trip-summary {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1000;
+
+  &--expanded {
+    .trip-summary__details {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    border-top: 2px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
+
+  &__totals {
+    display: flex;
+    gap: 2rem;
+    font-weight: 500;
+
+    span {
+      color: #333;
+    }
+  }
+
+  &__toggle {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      color: #2196f3;
+      transform: scale(1.1);
+    }
+  }
+
+  &__details {
+    padding: 0 2rem 1rem;
+    border-top: 1px solid #e0e0e0;
+    background: #f8f9fa;
+  }
+
+  &__segment {
+    padding: 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin: 1rem 0;
+    background: #fff;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateX(4px);
+      border-color: #2196f3;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &__segment-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__segment-number {
+    background: #2196f3;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  &__segment-cities {
+    font-weight: 500;
+    color: #333;
+  }
+
+  &__segment-details {
+    display: flex;
+    gap: 2rem;
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 2.5rem;
+
+    span:last-child {
+      color: #2196f3;
+      font-weight: 500;
+    }
+  }
+}
+
+.custom-marker {
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

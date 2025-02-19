@@ -1,0 +1,40 @@
+.header {
+  padding: 1rem 2rem;
+  background-color: #f8f9fa;
+
+  &__nav {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  &__list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__item {
+    margin-right: 2rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &__link {
+    text-decoration: none;
+    color: #333;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #007bff;
+    }
+
+    &--active {
+      color: #007bff;
+      font-weight: bold;
+    }
+  }
+}
