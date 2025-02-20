@@ -1,0 +1,24 @@
+@mixin transport-icon() {
+  $transports: (
+    'avion-courtcourrier': 'avion',
+    'avion-moyencourrier': 'avion',
+    'avion-longcourrier': 'avion',
+    'tgv': 'tgv',
+    'intercites': 'intercities',
+    'moto': 'moto',
+    'busthermique': 'busthermique',
+    'autocar': 'autocar',
+    'marche': 'marche',
+    'trottinette': 'trottinette',
+    'veloelectrique': 'veloelectrique',
+    'voitureelectrique': 'voitureelectrique',
+    'carpool-electric': 'voitureelectrique',
+    'voiturethermique': 'voiturethermique',
+    'carpool-combustion': 'voiturethermique',
+  );
+  @each $transport, $transportIconId in $transports {
+    &--#{$transport} {
+      background-image: url(../assets/#{$transportIconId}.svg);
+    }
+  }
+}

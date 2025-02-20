@@ -1,11 +1,20 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
-const transportAPI = "https://impactco2.fr/api/v1/transport";
-const cityAPI = "https://photon.komoot.io/api/";
-const distanceApiUrl = "https://impactco2.fr/api/callGMap";
+const TRANSPORT_API: string = "https://impactco2.fr/api/v1/transport";
+const CITY_API: string = "https://photon.komoot.io/api/";
+const TRANSPORT_DETAILS_API: string = "https://impactco2.fr/api/v1/thematiques/ecv/4?detail=1&language=en";
 
-export const transportCustomFetch = axios.create({
-    baseURL: transportAPI,
+interface TransportParams {
+  km: number;
+  displayAll: number;
+  ignoreRadiativeForcing: number;
+  occupencyRate: number;
+  includeConstruction: number;
+  language: string;
+}
+
+export const transportCustomFetch: AxiosInstance = axios.create({
+    baseURL: TRANSPORT_API,
     params: {
       km: 100,
       displayAll: 0,
@@ -13,14 +22,13 @@ export const transportCustomFetch = axios.create({
       occupencyRate: 1,
       includeConstruction: 0,
       language: "en",
-    }
+    } as TransportParams
 });
 
-export const cityCustomFetch = axios.create({
-    baseURL: cityAPI,
+export const transportDetailsFetch: AxiosInstance = axios.create({
+    baseURL: TRANSPORT_DETAILS_API,
 });
 
-export const tripDistanceFetch = axios.create({
-    baseURL: distanceApiUrl,
-    headers: { "Authorization": "Bearer 5da2a7d3-addf-4b3f-baae-7dfa2ef5b9a4"}
+export const cityCustomFetch: AxiosInstance = axios.create({
+    baseURL: CITY_API,
 });

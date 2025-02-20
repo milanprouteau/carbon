@@ -1,12 +1,20 @@
-import { transportCustomFetch, cityCustomFetch, tripDistanceFetch } from "../utils/customFetch";
+import { transportCustomFetch, cityCustomFetch, transportDetailsFetch } from "../utils/customFetch";
 
 // Transport interfaces
+interface FootPrint {
+  id: number;
+  value: string;
+}
+
 interface TransportData {
   id: string;
   name: string;
   value: number;
   unit: string;
   description?: string;
+  details: FootPrint[];
+  footprintDetail?: FootPrint[];
+  slug: string;
 }
 
 interface TransportResponse {
@@ -74,6 +82,10 @@ class CitySearch implements City {
   }
 };
 
+interface TransportParams {
+  km: number;
+}
+
 const consolidateCarpoolingOptions = (transports: TransportData[]): TransportData[] => {
   const result: TransportData[] = [];
   const carpoolCombustion: TransportData | undefined = transports.find(t => 
@@ -111,60 +123,86 @@ const consolidateCarpoolingOptions = (transports: TransportData[]): TransportDat
   return result;
 };
 
-export const fetchTransports = async (params): Promise<TransportResponse | null> => {
+export const fetchTransports = async (params: TransportParams): Promise<TransportData[]> => {
   try {
-    const response = await transportCustomFetch.get<TransportResponse>("", { params });
-    if (response.data && response.data.data) {
-      // Consolidate carpooling options before returning
-      const consolidatedTransports = consolidateCarpoolingOptions(response.data.data);
-      return {
-        ...response.data,
-        data: consolidatedTransports
-      };
+    const response = await transportCustomFetch.get<TransportResponse>('', { params });
+    if (!response?.data?.data) {
+      throw new Error('No response from transport API');
     }
-    return response.data;
-  } catch (error) {
-    return null;
+
+    // Consolidate carpooling options before returning
+    const consolidatedTransports = consolidateCarpoolingOptions(response.data.data);
+    const transportsDetails = await fetchTransportDetails();
+
+    return consolidatedTransports.map((transport) => {
+      if (transport.name === "Carpool Combustion") {
+        const combustionDetails = transportsDetails.find(({name}) => name === "Combustion car");
+        return {
+          ...transport,
+          details: combustionDetails?.footprintDetail || [],
+          slug: combustionDetails?.slug || '',
+        };
+      }
+
+      if (transport.name === "Carpool Electric") {
+        const electricDetails = transportsDetails.find(({name}) => name === "Electric car");
+        return {
+          ...transport,
+          details: electricDetails?.footprintDetail || [],
+          slug: electricDetails?.slug || '',
+        };
+      }
+      const details = transportsDetails.find(({name}) => name === transport.name)?.footprintDetail || [];
+      const slug = transportsDetails.find(({name}) => name === transport.name)?.slug || '';
+      return {
+        ...transport,
+        details,
+        slug,
+      };
+    });
+  } catch (error: unknown) {
+    console.error('Error fetching transports:', error instanceof Error ? error.message : 'Unknown error');
+    throw error;
+  }
+};
+
+export const fetchTransportDetails = async (): Promise<TransportData[]> => {
+  try {
+    const response = await transportDetailsFetch.get<{ data: TransportData[] }>('');
+    if (!response?.data) {
+      throw new Error('No response from transport details API');
+    }
+    return response.data.data;
+  } catch (error: unknown) {
+    console.error('Error fetching transport details:', error instanceof Error ? error.message : 'Unknown error');
+    throw error;
   }
 };
 
 export const fetchCities = async (query: string): Promise<City[]> => {
   try {
-    const params = { q: query };
-    const response = await cityCustomFetch.get<CitiesApiResponse>("", { params });
+    const response = await cityCustomFetch.get<CitiesApiResponse>('', { params: { q: query } });
+    if (!response?.data?.features) {
+      return [];
+    }
     return response.data.features
       .filter(({ properties }) => properties.type === "city")
-      .map((city) => new CitySearch(city));
-  } catch (error) {
-    console.error('Error fetching cities:', error);
+      .map(feature => new CitySearch(feature));
+  } catch (error: unknown) {
+    console.error('Error fetching cities:', error instanceof Error ? error.message : 'Unknown error');
     return [];
   }
 };
 
-export const getTripDistance = async ({ origin, destination }: { origin: [number, number], destination: [number, number] }): Promise<TripDistanceResponse | null> => {
-  try {
-    const data: TripDistanceRequest = {
-      origins: {
-        latitude: origin[0],
-        longitude: origin[1],
-      },
-      destinations: {
-        latitude: destination[0],
-        longitude: destination[1],
-      }
-    };
-    const response = await tripDistanceFetch.post<TripDistanceResponse>("", data);
-    return response.data;
-  } catch (err) {
-    console.error('Error getting trip distance:', err);
-    return null;
-  }
-};
-
-export function debounce<T extends (...args: any[]) => any>(func: T, timeout = 300) {
+export function debounce<T extends (...args: any[]) => Promise<void>>(
+  func: T,
+  timeout = 300
+): (...args: Parameters<T>) => void {
   let timer: NodeJS.Timeout;
-  return function(this: ThisParameterType<T>, ...args: Parameters<T>) {
+  return function(this: void, ...args: Parameters<T>): void {
     clearTimeout(timer);
-    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    timer = setTimeout(() => {
+      func.apply(undefined, args);
+    }, timeout);
   };
-};
+}

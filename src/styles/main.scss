@@ -1,3 +1,5 @@
+@use 'mixins' as *;
+
 // Variables
 $primary-color: #007bff;
 $secondary-color: #6c757d;
@@ -42,4 +44,12 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.transport-icon {
+  @include transport-icon;
+  height: 30px;
+  width: 30px;
+  background-repeat: no-repeat;
+  background-position: center;
 }
